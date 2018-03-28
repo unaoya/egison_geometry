@@ -1,0 +1,20 @@
+(define $x [|u v|])
+
+(define $X [|u v (sqrt '(- 1 (* u u) (* v v)))|])
+
+(define $e_i_j (∂/∂ X_j x~i))
+
+(define $g__ (generate-tensor 2#(V.* e_%1_# e_%2_#) {2 2}))
+(define $g~~ (M.inverse g_#_#))
+
+(define $Γ_j_k_l
+  (* (/ 1 2)
+     (+ (∂/∂ g_j_l x~k)
+        (∂/∂ g_j_k x~l)
+        (* -1 (∂/∂ g_k_l x~j)))))
+
+(define $Γ~__ (with-symbols {i} (. g~#~i Γ_i_#_#)))
+
+;(match (expand-all Γ~1_1_1) (something) [<cons $x $xs> [quote xs]])
+
+(car (+ y z))
