@@ -1,0 +1,21 @@
+(define $indef-integrate
+	(lambda	[$p]
+	        (match p math-expr
+		       {[,0 0]
+			[<term $c <nil>> (* c x)]
+		        [(* $a ,x^$k) (*' (/ a (+ k 1)) (**' x (+ k 1)))]
+			[<poly $ts> (sum (map indef-integrate ts))]
+			[<div $q $c> (/ (indef-integrate q) c)]})))
+
+(indef-integrate 0)
+(indef-integrate 3)
+(indef-integrate x^2)
+(indef-integrate (+ x 1))
+(indef-integrate (/ x 2))
+
+(define $integrate
+	(lambda [$p $a $b]
+		(let {[$P (indef-integrate p)]}
+		     (- (substitute {[x b]} P) (substitute {[x a]} P)))))
+
+(integrate x -1 1)
