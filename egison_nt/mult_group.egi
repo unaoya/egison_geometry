@@ -1,0 +1,10 @@
+(map (lambda [$x] (map 1#(modulo (* %1 x) 5) (between 1 4))) (between 1 4))
+
+((lambda [$n] (map (lambda [$x] (map 1#(modulo (* %1 x) n) (between 1 n))) (between 1 n))) 6)
+
+(define $n 6)
+
+(map (lambda [$x] (map 1#(modulo (* %1 x) n) (between 1 n))) (between 1 n))
+
+(match {1 2 3} (list integer) {[<cons _ <cons ,1 _>> #t] [_ #f]})
+                                                          
