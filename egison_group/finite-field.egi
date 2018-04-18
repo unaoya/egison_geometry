@@ -1,0 +1,16 @@
+(map-term
+
+> (+ (* 2 x) 3)
+(+ (* 2 x) 3)
+> (modulo (+ (* 2 x) 3) 2)
+Expected integer, but found: (+ (* 2 x) 3)
+> (+ (* 2 x) (* 3 x)
+  )
+(* 5 x)
+> (modulo (+ (* 2 x) (* 3 x)) 2)
+Expected integer, but found: (* 5 x)
+> (coefficients (* 5 x) x)
+{0 5}
+> (modulo (coefficients (* 5 x) x) 5)
+Expected integer, but found: {0 5}
+> 

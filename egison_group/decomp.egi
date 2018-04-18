@@ -1,0 +1,16 @@
+(define $n 12)
+
+(define $X (between 0 (- n 1)))
+
+(define $k 3)
+
+(define $translation-k
+  (lambda [$x] (map (lambda [$y] (modulo (+ x (* k y)) n)) (between 0 (- (/ n k) 1)))))
+
+(define $decomp
+  (lambda [$X $f]
+    (match X (list integer)
+      {[<nil> {}]
+       [<cons $x $xs> (add (f x) (decomp (difference X (f x)) f))]})))
+
+(decomp X translation-k)

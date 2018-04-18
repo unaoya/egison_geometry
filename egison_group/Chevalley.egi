@@ -1,0 +1,93 @@
+(define $p 3)
+
+;definition of the field F_p
+
+(define $p.b.+
+  (lambda [%x %y] (modulo (+ x y) p)))
+
+(define $p.+
+  (cambda $xs (foldl p.b.+ (car xs) (cdr xs))))
+
+(define $p.b.-
+  (lambda [%x %y] (modulo (- x y) p)))
+
+(define $p.-
+  (cambda $xs (foldl p.b.- (car xs) (cdr xs))))
+
+(define $p.b.*
+  (lambda [%x %y] (modulo (* x y) p)))
+
+(define $p.*
+  (cambda $xs (foldl p.b.* (car xs) (cdr xs))))
+
+(define $p.inv
+  (lambda [%x]
+    (car (filter (lambda [$a] (eq? (p.* a x) 1)) (take p nats)))))
+
+(define $p.b./
+  (lambda [%x %y] (p.* x (p.inv y))))
+
+(define $p./
+  (cambda $xs (foldl p.b./ (car xs) (cdr xs))))
+
+;definition of the group GL(n,p), SL(n,p)
+
+(define $p.det
+  (lambda [%g] (modulo (M.det g) p)))
+
+(define $p.trace
+  (lambda [%g] (modulo (trace g) p)))
+
+(define $GL2
+  (filter (lambda [%g] (not (eq? (p.det g) 0)))
+          (match-all (map (lambda [$x] (- x 1)) (take p nats)) (set integer)
+            [<cons $a <cons $b <cons $c <cons $d _>>>> [|[|a b|] [|c d|]|]])))
+
+(length GL2)
+
+(define $GL2.b.*
+  (lambda [%g %h]
+    (modulo (M.* g h) p)))
+
+(define $GL2.*
+  (cambda $gs
+    (foldl GL2.b.* (car gs) (cdr gs))))
+
+(define $GL2.inv
+  (lambda [%g] (modulo (p./ [|[|g_2_2 (* -1 g_1_2)|] [|(* -1 g_2_1) g_1_1|]|] (p.det g)) p)))
+
+(define $G GL2)
+
+(define $G.* GL2.*)
+
+(define $G.inv GL2.inv)
+
+;definition of operation on a group
+
+(define $G.conj
+  (lambda [%g %h]
+    (G.* (G.inv h) g h)))
+
+(define $G.conj-class
+  (lambda [%g]
+    (unique (map (lambda [%h] (G.conj g h)) G))))
+
+(define $decomp
+  (lambda [$X $f]
+    (match X (list integer)
+      {[<nil> {}]
+       [<cons $x $xs> (add (f x) (decomp (difference X (f x)) f))]})))
+
+(define $char-poly
+  (lambda [%g]
+    (+ (** x 2) (* x (modulo (* (p.trace g) -1) p)) (p.det g))))
+
+;(decomp G G.conj-class)
+(map char-poly (G.conj-class (car G)))
+
+(define $SL2
+  (filter (lambda [%g] (eq? (p.det g) 1))
+          (match-all {0 1 2} (set integer)
+            [<cons $a <cons $b <cons $c <cons $d _>>>> [|[|a b|] [|c d|]|]])))
+
+(length SL2)
