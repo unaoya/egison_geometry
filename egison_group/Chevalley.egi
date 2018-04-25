@@ -82,8 +82,7 @@
   (lambda [%g]
     (+ (** x 2) (* x (modulo (* (p.trace g) -1) p)) (p.det g))))
 
-;(decomp G G.conj-class)
-(map char-poly (G.conj-class (car G)))
+(map (lambda [$gs] (unique (map char-poly gs))) (decomp G G.conj-class))
 
 (define $SL2
   (filter (lambda [%g] (eq? (p.det g) 1))
@@ -91,3 +90,5 @@
             [<cons $a <cons $b <cons $c <cons $d _>>>> [|[|a b|] [|c d|]|]])))
 
 (length SL2)
+
+(map (lambda [$gs] (unique (map char-poly gs))) (decomp SL2 G.conj-class))

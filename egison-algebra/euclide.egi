@@ -1,0 +1,80 @@
+(define $p 5)
+
+(define $p.b.+
+  (lambda [%x %y] (modulo (+ x y) p)))
+
+(define $p.+
+  (cambda $xs (foldl p.b.+ (car xs) (cdr xs))))
+
+(define $p.b.-
+  (lambda [%x %y] (modulo (- x y) p)))
+
+(define $p.-
+  (cambda $xs (foldl p.b.- (car xs) (cdr xs))))
+
+(define $p.b.*
+  (lambda [%x %y] (modulo (* x y) p)))
+
+(define $p.*
+  (cambda $xs (foldl p.b.* (car xs) (cdr xs))))
+
+(define $p.inv
+  (lambda [%x]
+    (car (filter (lambda [$a] (eq? (p.* a x) 1)) (take p nats)))))
+
+(define $p.b./
+  (lambda [%x %y] (p.* x (p.inv y))))
+
+(define $p./
+  (cambda $xs (foldl p.b./ (car xs) (cdr xs))))
+
+(define $L./
+  (lambda [$xs $ys]
+    (if (lt? (length xs) (length ys))
+      [{} xs]
+      (match [ys xs] [(list math-expr) (list math-expr)]
+        {
+         [[<cons $y $yrs> <cons $x $xrs>]
+          (let {[[$zs $rs] (L./ {@(map2 p.- (take (length yrs) xrs) (map (p.* $ (p./ x y)) yrs))
+                                 @(drop (length yrs) xrs)} ys)]}
+            [{(p./ x y) @zs} rs])]
+         }))))
+
+(define $P./
+  (lambda [$fx $gx $x]
+    (let* {[$as (reverse (coefficients fx x))]
+           [$bs (reverse (coefficients gx x))]
+           [[$zs $rs] (L./ as bs)]}
+      [(sum' (map2 2#(*' %1 (**' x %2)) (reverse zs) nats0))
+       (sum' (map2 2#(*' %1 (**' x %2)) (reverse rs) nats0))])))
+
+(define $gcd
+  (lambda [$f $g $x]
+    (let {[$q (fst (P./ f g x))] [$r (snd (P./ f g x))]}
+      (match r math-expr
+        {[,0 g]
+         [_ (gcd g r x)]}))))
+
+(define $Cantor-Zassenhaus
+  (lambda [$f $b $x $d]
+    (let* {[$m (/ (- (** p d) 1) 2)]
+           [$a (** b m)]}
+      {(gcd f a x) (gcd f (+ a 1) x) (gcd f (- a 1) x)})))
+
+(Cantor-Zassenhaus (+ (** x 2) (* x 3) 2) x x 1)
+
+;Yun's algorithm
+;(define $SFF
+   ;  (lambda [$f $x]
+        ;    (let* {[$g (∂/∂ f x)]
+                 ;           [$c (gcd f g x)]}
+       ;           [$w (fst (P./ f c))]})))
+
+(define $DDF'
+  (lambda [$f $i $x]
+    (let* {[$g (gcd (- (** x (** p i)) x) f)]
+           [$q (fst (P./ f g x))]}
+      (match g math-expr
+        {[,1 (DDF' f (+ i 1) x)]
+         [_ (DDF' f (P./ f g x) (+ i 1) x)]}))))
+         

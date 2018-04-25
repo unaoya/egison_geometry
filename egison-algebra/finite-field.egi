@@ -1,0 +1,41 @@
+(define $p 5)
+(map (lambda [$c] (modulo c 5)) (coefficients (** (+ x 1) 5) x))
+
+(define $map-terms2
+  (lambda [$fn $mexpr]
+    (match mexpr math-expr
+      {[<div <poly $ts1> <poly $ts2>>
+        (/' (foldl +' 0 (map fn ts1))
+           (foldl +' 0 ts2))]})))
+
+(define $map-terms3
+  (lambda [$fn $mexpr]
+    (match mexpr math-expr
+      {[<div <poly $ts1> <poly $ts2>>
+        [(map (lambda [$f] (coefficients f x)) ts1)
+         (map (lambda [$f] (coefficients f x)) ts2)]]})))
+;        (/' (foldl +' 0 (map fn ts1))
+;           (foldl +' 0 ts2))]})))
+
+(define $add1 (lambda [$x] (+ x 1)))
+
+(map-terms3 add1 x)
+(map-terms3 add1 (+ x 1))
+
+;(define $poly.mod.p
+;  (lambda [$P]
+;    (map-term)))
+
+;> (+ (* 2 x) 3)
+;(+ (* 2 x) 3)
+;> (modulo (+ (* 2 x) 3) 2)
+;Expected integer, but found: (+ (* 2 x) 3)
+;> (+ (* 2 x) (* 3 x))
+;(* 5 x)
+;> (modulo (+ (* 2 x) (* 3 x)) 2)
+;Expected integer, but found: (* 5 x)
+;> (coefficients (* 5 x) x)
+;{0 5}
+;> (modulo (coefficients (* 5 x) x) 5)
+;Expected integer, but found: {0 5}
+;> 
