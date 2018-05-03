@@ -1,41 +1,105 @@
 (define $p 5)
-(map (lambda [$c] (modulo c 5)) (coefficients (** (+ x 1) 5) x))
+(define $mod-p
+  (lambda [$x] (modulo x p)))
 
-(define $map-terms2
-  (lambda [$fn $mexpr]
-    (match mexpr math-expr
-      {[<div <poly $ts1> <poly $ts2>>
-        (/' (foldl +' 0 (map fn ts1))
-           (foldl +' 0 ts2))]})))
+;definition of the field F_p
+(define $p.b.+
+  (lambda [%x %y] (modulo (+ x y) p)))
+(define $p.+
+  (cambda $xs (foldl p.b.+ (car xs) (cdr xs))))
+(define $p.b.-
+  (lambda [%x %y] (modulo (- x y) p)))
+(define $p.-
+  (cambda $xs (foldl p.b.- (car xs) (cdr xs))))
+(define $p.b.*
+  (lambda [%x %y] (modulo (* x y) p)))
+(define $p.*
+  (cambda $xs (foldl p.b.* (car xs) (cdr xs))))
+(define $p.inv
+  (lambda [%x]
+    (car (filter (lambda [$a] (eq? (p.* a x) 1)) (take p nats)))))
+(define $p.b./
+  (lambda [%x %y] (p.* x (p.inv y))))
+(define $p./
+  (cambda $xs (foldl p.b./ (car xs) (cdr xs))))
 
-(define $map-terms3
-  (lambda [$fn $mexpr]
-    (match mexpr math-expr
-      {[<div <poly $ts1> <poly $ts2>>
-        [(map (lambda [$f] (coefficients f x)) ts1)
-         (map (lambda [$f] (coefficients f x)) ts2)]]})))
-;        (/' (foldl +' 0 (map fn ts1))
-;           (foldl +' 0 ts2))]})))
+;definition of the ring F_p[x]
+(define $coef-mod-p
+  (lambda [$f $x]
+    (foldr 2#(+ (* x %2) %1) 0 (map mod-p (coefficients f x)))))
+(define $f.p.b.+
+  (lambda [%a %b] (coef-mod-p (+ a b) x)))
+(define $f.p.+
+  (cambda $xs (foldl f.p.b.+ (car xs) (cdr xs))))
+(define $f.p.b.-
+  (lambda [%a %b] (coef-mod-p (- a b) x)))
+(define $f.p.-
+  (cambda $xs (foldl f.p.b.- (car xs) (cdr xs))))
+(define $f.p.b.*
+  (lambda [%a %b] (coef-mod-p (* a b) x)))
+(define $f.p.*
+  (cambda $xs (foldl f.p.b.* (car xs) (cdr xs))))
+(define $f.p.inv
+  (lambda [%x]
+    (car (filter (lambda [$a] (eq? (p.* a x) 1)) (take p nats)))))
 
+(define $p.L./
+  (lambda [$xs $ys]
+    (if (lt? (length xs) (length ys))
+      [{} xs]
+      (match [ys xs] [(list math-expr) (list math-expr)]
+        {
+         [[<cons $y $yrs> <cons $x $xrs>]
+          (let {[[$zs $rs] (p.L./ {@(map2 p.- (take (length yrs) xrs) (map (p.* $ (p./ x y)) yrs))
+                                   @(drop (length yrs) xrs)} ys)]}
+            [{(p./ x y) @zs} rs])]
+         }))))
+
+(define $p.P./
+  (lambda [$fx $gx $x]
+    (let* {[$as (reverse (coefficients fx x))]
+           [$bs (reverse (coefficients gx x))]
+           [[$zs $rs] (p.L./ as bs)]}
+      [(sum (map2 2#(f.p.* %1 (**' x %2)) (reverse zs) nats0))
+       (sum (map2 2#(f.p.* %1 (**' x %2)) (reverse rs) nats0))])))
+
+
+;construction of quadratic ext
+(define $f (+ (** x 2) 2))
+;(map 1#(snd (p.P./ (** x %1) f x)) (take 25 nats))
+;{x 3 (* 3 x) 4 (* 4 x) 2 (* 2 x) 1 x 3 (* 3 x) 4 (* 4 x) 2 (* 2 x) 1 x 3 (* 3 x) 4 (* 4 x) 2 (* 2 x) 1 x}
+
+;(map 1#(snd (p.P./ (** (+ x 1) %1) f x)) (take 25 nats))
+;{(+ 1 x) (+ 4 (* 2 x)) x (+ 3 x) (+ 1 (* 4 x)) 3 (+ 3 (* 3 x)) (+ 2 x) (* 3 x) (+ 4 (* 3 x)) (+ 3 (* 2 x)) 4 (+ 4 (* 4 x)) (+ 1 (* 3 x)) (* 4 x) (+ 2 (* 4 x)) (+ 4 x) 2 (+ 2 (* 2 x)) (+ 3 (* 4 x)) (* 2 x) (+ 1 (* 2 x)) (+ 2 (* 3 x)) 1 (+ 1 x)}
+
+;(snd (p.P./ (** x p) f x))
+;(snd (p.P./ (** x (** p 2)) f x))
+(define $Frob (lambda [$a] (snd (p.P./ (** a p) f x))))
+;(Frob x)
+;(Frob (Frob x))
+
+;construction of cubic extension
+(define $addf (lambda [$f $xs] (cons (f (car xs)) xs)))
 (define $add1 (lambda [$x] (+ x 1)))
+(define $recf
+  (lambda [$f $xs $n]
+    (match n integer
+      {[,0 xs]
+       [_ (recf f (cons (f (car xs)) xs) (- n 1))]})))
 
-(map-terms3 add1 x)
-(map-terms3 add1 (+ x 1))
+(define $g (+ (** x 3) x 1))
+(define $multx (lambda [$y] (snd (p.P./ (f.p.* x y) g x))))
+(car (recf multx {1} 124))
+;(map 1#(snd (p.P./ (** x %1) g x)) (take 125 nats))
 
-;(define $poly.mod.p
-;  (lambda [$P]
-;    (map-term)))
+(define $Frob2 (lambda [$a] (snd (p.P./ (** a p) g x))))
+;(Frob2 x)
+;(Frob2 (Frob2 x))
+;(Frob2 (Frob2 (Frob2 x)))
 
-;> (+ (* 2 x) 3)
-;(+ (* 2 x) 3)
-;> (modulo (+ (* 2 x) 3) 2)
-;Expected integer, but found: (+ (* 2 x) 3)
-;> (+ (* 2 x) (* 3 x))
-;(* 5 x)
-;> (modulo (+ (* 2 x) (* 3 x)) 2)
-;Expected integer, but found: (* 5 x)
-;> (coefficients (* 5 x) x)
-;{0 5}
-;> (modulo (coefficients (* 5 x) x) 5)
-;Expected integer, but found: {0 5}
-;> 
+;construction of quartic extension
+(define $h (+ (** x 4) x 4))
+(define $multx2 (lambda [$y] (snd (p.P./ (f.p.* x y) h x))))
+(car (recf multx2 {1} 624))
+
+;(map 1#(snd (p.P./ (** x %1) g x)) (take 625 nats))
