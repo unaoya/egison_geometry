@@ -1,0 +1,1 @@
+((lambda [%X $i] X_(nth 1 i)_(nth 2 i)_(nth 3 i)) X {3 4 5})

@@ -1,0 +1,60 @@
+;(define $min (lambda [%x %y] (if (lt? x y) x y)))
+
+;(min [|1 2 3|]_i [|10 20 30|]_j)
+
+;(min [|1 2 3|]_i [|10 20 30|]_i)
+
+(define $. (lambda [%t1 %t2] (contract + (* t1 t2))))
+
+(. [|1 2 3|]_i [|10 20 30|]_j)
+
+(. [|1 2 3|]_i [|10 20 30|]_i)
+
+(. [|1 2 3|]_i [|10 20 30|]~i)
+
+(* [|1 2 3|]_i [|10 20 30|]_j)
+
+(* [|1 2 3|]_i [|10 20 30|]_i)
+
+(* [|1 2 3|]_i [|10 20 30|]~i)
+
+(* [|1 2 3|] [|10 20 30|])
+
+;(cons [|a b|]_i [|{a} {b}|]_j)
+
+;(cons [|a b|]_i [|{a} {b}|]_i)
+
+;(cons [|a b|]_i [|{a} {b}|]~i)
+
+;(define $tasu (lambda [%x %y] (+ x y)))
+
+;(tasu 1 2)
+
+;(define $tasu2 (lambda [$x $y] (+ x y)))
+
+;(tasu2 1 2)
+
+(define $wedge (lambda [%X %Y] !(. X Y)))
+
+(wedge [|[|1 2|] [|3 4|]|] [|5 0|])
+
+(wedge [|1 2|] [|3 4|])
+
+(. [|1 2|] [|3 4|])
+
+(* [|1 2|]_i [|3 4|]_j)
+
+
+(define $df-normalize
+  (lambda [%X]
+    (let* {[$p (df-order X)]
+           [[$es $os] (even-and-odd-permutations p)]}
+      (with-symbols {i}
+        (/ (- (sum (map (lambda [$σ] (subrefs X (map 1#i_(σ %1) (between 1 p)))) es))
+              (sum (map (lambda [$σ] (subrefs X (map 1#i_(σ %1) (between 1 p)))) os)))
+           (* (fact p)))))))
+
+(contract + (* [|[|1 0|] [|0 1|]|]~i_j [|[|1 1|] [|0 1|]|]~j_k))
+
+(df-normalize [|[|0 1|] [|1 0|]|])
+

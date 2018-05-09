@@ -1,0 +1,37 @@
+(define $X [|x y|])
+
+(define $abssq
+  (lambda [%X] (+ (* X_1 X_1) (* X_2 X_2))))
+
+(define $omega
+  (lambda [%X] [|(/ (* -1 X_2) (abssq X)) (/ X_1 (abssq X))|]))
+
+(omega X) ;[| (/ (* -1 y) (+ x^2 y^2)) (/ x (+ x^2 y^2)) |]
+
+(define $f1 (lambda [%X] [|(* -1 X_1) (* -1 X_2)|]))
+(define $f2 (lambda [%X] [|(* X_1) (* X_2)|]))
+(define $f3 (lambda [%X] [|(* -1 X_1) (* X_2)|]))
+
+(define $pullback
+  (lambda [$omega $f %X]
+    (V.* ((flip ∂/∂) X~# (f X)_#) (omega (f X)))))
+
+(pullback omega f1 X) ;[| (/ (* -1 y) (+ x^2 y^2)) (/ x (+ x^2 y^2)) |]
+(pullback omega f2 X) ;[| (/ (* -1 y) (+ x^2 y^2)) (/ x (+ x^2 y^2)) |]
+(pullback omega f3 X) ;[| (/ y (+ x^2 y^2)) (/ (* -1 x) (+ x^2 y^2)) |]
+
+(define $f4 (lambda [%X] [|(- (** x 2) (** y 2)) (* 2 x y)|]))
+(pullback omega f4 X)
+
+(define $phi (lambda [%X] [|(cos X_1) (sin X_1)|]))
+((flip ∂/∂) [|theta|]~# (phi [|theta|])_#)
+((flip ∂/∂) [|theta|]~# (phi [|theta|])_#)_1
+(. ((flip ∂/∂) [|theta|]~i (phi [|theta|])_j) (omega (phi [|theta|]))~j)
+
+(. ((flip ∂/∂) [|theta|]~i (f4 (phi [|theta|]))_j)_1 (omega (phi [|theta|]))~j)
+
+(pullback omega phi [|theta|])
+
+(define $g (lambda [%X] [|X_1 (sqrt (- 1 (** X_1 2)))|]))
+
+(pullback omega g [|x|]) ;[| (* -1 (sqrt (+ 1 (* -1 x^2)))) x |]
