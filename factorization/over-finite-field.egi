@@ -1,30 +1,47 @@
 (define $p 5)
 
-(define $coef-mod
-  (lambda [$f]
-    (sum' (map2 2#(*' %1 (**' x %2)) (map 1#(modulo %1 p) (coefficients f x)) nats0))))
+(define $coef-map
+  (lambda [$f $P $x]
+    (sum' (map2 2#(*' %1 (**' x %2)) (map f (coefficients P x)) nats0))))
 
 ;operation on Fp[x]
+(define $coef-mod
+  (lambda [$P]
+    (coef-map 1#(modulo %1 p) P x)))
 
 (define $p.b.+
   (lambda [%x %y] (coef-mod (+ x y))))
+
 (define $p.+
   (cambda $xs (foldl p.b.+ (car xs) (cdr xs))))
+
 (define $p.b.-
   (lambda [%x %y] (coef-mod (- x y))))
+
 (define $p.-
   (cambda $xs (foldl p.b.- (car xs) (cdr xs))))
+
 (define $p.b.*
   (lambda [%x %y] (coef-mod (* x y))))
+
 (define $p.*
   (cambda $xs (foldl p.b.* (car xs) (cdr xs))))
+
 (define $p.inv
   (lambda [%x]
     (car (filter (lambda [$a] (eq? (p.* a x) 1)) (take p nats)))))
+
 (define $p.b./
   (lambda [%x %y] (p.* x (p.inv y))))
+
 (define $p./
   (cambda $xs (foldl p.b./ (car xs) (cdr xs))))
+
+(define $p.**
+  (lambda [$x $n]
+    (match n integer
+      {[,0 1]
+       [_ (p.* x (p.** x (- n 1)))]})))
 
 (define $p.L./
   (lambda [$xs $ys]
@@ -74,21 +91,17 @@
 (define $Cantor-Zassenhaus
   (lambda [$f $b $x $d]
     (let* {[$m (/ (- (** p d) 1) 2)]
-           [$a (** b m)]}
-      {(gcd f a x) (gcd f (+ a 1) x) (gcd f (- a 1) x)})))
-
-;(Cantor-Zassenhaus (+ (** x 2) (* x 3) 2) x x 1)
+           [$a (p.** b m)]}
+      {(p.gcd f a x) (p.gcd f (p.+ a 1) x) (p.gcd f (p.- a 1) x)})))
 
 ;square free factorization in ch 0
-(define $SFF
+(define $SFF0
   (lambda [$f $x]
     (let* {[$g (∂/∂ f x)]
            [$c (gcd f g x)]}
       (match c math-expr
-        {[,1 f]
-         [_ {(fst (P./ f c x)) (SFF c x)}]}))))
-
-;(SFF (* (** (+ x 1) 2) (** x 2)) x)
+        {[,1 {f}]
+         [_ (cons (fst (P./ f c x)) (SFF0 c x))]}))))
 
 ;in ch p
 ;(define $SFF
@@ -96,6 +109,7 @@
 ;    (let* {[$g (∂/∂ f x)]
 ;           [$c (gcd f g x)]
 ;           [$w (fst (P./ f c))]})))
+
 (define $deg
   (lambda [$f $x]
     (length (coefficients f x))))
@@ -105,11 +119,26 @@
     (let* {[$g (p.gcd (- (** x (** p i)) x) f x)]
            [$q (p.monic (fst (P./ f g x)) x)]}
       (match q math-expr
-        {[,1 {[f (deg f x)]}]
+        {[,1 {[f i]}]
          [_ (cons [g i] (DDF' q (+ i 1) x))]}))))
 
 (define $DDF
   (lambda [$f $x] (DDF' f 1 x)))
 
-(define $f (+ (** x 3) (** x 2) x 2))
-(DDF f x)
+(define $f (+ (** x 4) x 1))
+;(DDF f x)
+;{[(+ 2 x) 1] [1 2] [(+ 3 (* 4 x) (* 3 x^2) x^3) 3]}
+(fst [x 2])
+(fst [(+ x 1) 3])
+(snd [x 2])
+(snd [(+ x 1) 3])
+(map fst (DDF f x))
+(map snd (DDF f x))
+(map2 2#(Cantor-Zassenhaus %1 x x %2) (map fst (DDF f x)) (map snd (DDF f x)))
+;(Cantor-Zassenhaus (+ 3 (* 4 x) (* 3 x^2) x^3) x x 3)
+;(Cantor-Zassenhaus 1 x x 2)
+;(Cantor-Zassenhaus (+ 2 x) x x 1)
+
+;(Cantor-Zassenhaus f x x 1)
+;(Cantor-Zassenhaus f (+ x 1) x 1)
+
