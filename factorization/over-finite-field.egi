@@ -1,4 +1,4 @@
-(define $p 5)
+(define $p 3)
 
 (define $coef-map
   (lambda [$f $P $x]
@@ -73,7 +73,7 @@
 
 (define $gcd
   (lambda [$f $g $x]
-    (if (eq? g 0) f
+    (if (eq? g 0) 0
       (let {[$q (fst (P./ f g x))] [$r (snd (P./ f g x))]}
         (match r math-expr
           {[,0 (monic g x)]
@@ -81,7 +81,7 @@
 
 (define $p.gcd
   (lambda [$f $g $x]
-    (if (eq? g 0) f
+    (if (eq? g 0) 0
       (let {[$q (fst (p.P./ f g x))] [$r (snd (p.P./ f g x))]}
         (match r math-expr
           {[,0 (p.monic g x)]
@@ -103,12 +103,34 @@
         {[,1 {f}]
          [_ (cons (fst (P./ f c x)) (SFF0 c x))]}))))
 
+(define $SFF'
+  (lambda [$w $c $i $R]
+    (match w math-expr
+      {[,1 {w c i R}]
+       [_ (let* {[$y (p.gcd w c x)]
+                 [$fac (fst (p.P./ w y x))]}
+            (SFF' y (fst (p.P./ c y x)) (+ i 1) (cons [fac i] R)))]})))
+
+(define $c (+ (** x 9) (* 2 (** x 6)) (** x 3) 2))
+(define $w (+ (** x 2) 2))
+(SFF' w c 1 {1})
+
+                 
 ;in ch p
-;(define $SFF
-;  (lambda [$f $x]
-;    (let* {[$g (∂/∂ f x)]
-;           [$c (gcd f g x)]
-;           [$w (fst (P./ f c))]})))
+(define $SFF
+  (lambda [$f $x]
+    (let* {[$g (coef-mod (∂/∂ f x))]
+           [$c (p.gcd f g x)]
+           [$w (fst (p.P./ f c x))]}
+      (match c math-expr
+        {[,1 {f}]
+         [,0 {f}]
+         [_ (cons (fst (p.P./ f c x)) (SFF c x))]}))))
+(define $f (+ (** x 2) (* x 2) 1))
+(define $g (* (** (+ x 1) 3) x x x x))
+(define $h (** (+ x 1) 5))
+;(SFF f x)
+;(SFF h x)
 
 (define $deg
   (lambda [$f $x]
@@ -128,13 +150,13 @@
 (define $f (+ (** x 4) x 1))
 ;(DDF f x)
 ;{[(+ 2 x) 1] [1 2] [(+ 3 (* 4 x) (* 3 x^2) x^3) 3]}
-(fst [x 2])
-(fst [(+ x 1) 3])
-(snd [x 2])
-(snd [(+ x 1) 3])
-(map fst (DDF f x))
-(map snd (DDF f x))
-(map2 2#(Cantor-Zassenhaus %1 x x %2) (map fst (DDF f x)) (map snd (DDF f x)))
+;(map fst (DDF f x))
+;(map snd (DDF f x))
+;(map2 2#(Cantor-Zassenhaus %1 x x %2) (map fst (DDF f x)) (map snd (DDF f x)))
+;{(+ 2 x) 1 (+ 3 (* 4 x) (* 3 x^2) x^3)}
+;{1 2 3}
+;{{1 (+ 2 x) 1} {1 1 1} {1 (+ 3 (* 4 x) (* 3 x^2) x^3) 1}}
+
 ;(Cantor-Zassenhaus (+ 3 (* 4 x) (* 3 x^2) x^3) x x 3)
 ;(Cantor-Zassenhaus 1 x x 2)
 ;(Cantor-Zassenhaus (+ 2 x) x x 1)
