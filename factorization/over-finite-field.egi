@@ -71,9 +71,10 @@
   (lambda [$f $x]
     (p./ f (rac (coefficients f x)))))
 
+;gcd(f,0)=f
 (define $gcd
   (lambda [$f $g $x]
-    (if (eq? g 0) 0
+    (if (eq? g 0) f
       (let {[$q (fst (P./ f g x))] [$r (snd (P./ f g x))]}
         (match r math-expr
           {[,0 (monic g x)]
@@ -87,6 +88,31 @@
           {[,0 (p.monic g x)]
            [_ (p.gcd g r x)]})))))
 
+;square free factorization in ch 0
+;Yun's algorithm
+(define $Yun'
+  (lambda [$f $g $x]
+    (let* {[$a (gcd f g x)]
+           [$b (fst (P./ f a x))]
+           [$c (fst (P./ g a x))]
+           [$d (- c (∂/∂ b x))]}
+      (match b math-expr
+        {[,1 {a}]
+         [_ (cons a (Yun' b d x))]}))))
+
+(define $SFF0
+  (lambda [$f $x]
+    (cdr (Yun' f (∂/∂ f x) x))))
+
+(SFF0 (+ (** x 2) x) x)
+;{(+ x x^2)}
+(SFF0 (** x 2) x)
+;{1 x}
+(SFF0 (** (* x (+ x 1)) 2) x)
+;{1 (+ x x^2)}
+(SFF0 (* (** x 3) (+ x 1)) x)
+;{(+ 1 x) 1 x}
+
 ;ch 0?
 (define $Cantor-Zassenhaus
   (lambda [$f $b $x $d]
@@ -94,28 +120,14 @@
            [$a (p.** b m)]}
       {(p.gcd f a x) (p.gcd f (p.+ a 1) x) (p.gcd f (p.- a 1) x)})))
 
-;square free factorization in ch 0
-(define $SFF0
-  (lambda [$f $x]
-    (let* {[$g (∂/∂ f x)]
-           [$c (gcd f g x)]}
-      (match c math-expr
-        {[,1 {f}]
-         [_ (cons (fst (P./ f c x)) (SFF0 c x))]}))))
-
-(define $SFF'
-  (lambda [$w $c $i $R]
-    (match w math-expr
-      {[,1 {w c i R}]
-       [_ (let* {[$y (p.gcd w c x)]
-                 [$fac (fst (p.P./ w y x))]}
-            (SFF' y (fst (p.P./ c y x)) (+ i 1) (cons [fac i] R)))]})))
 
 (define $c (+ (** x 9) (* 2 (** x 6)) (** x 3) 2))
 (define $w (+ (** x 2) 2))
-(SFF' w c 1 {1})
+;(SFF' w c 1 {1})
 
-                 
+;rewrite p-th power (x^p -> x)
+
+              
 ;in ch p
 (define $SFF
   (lambda [$f $x]
