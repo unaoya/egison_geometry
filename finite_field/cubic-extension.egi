@@ -1,0 +1,25 @@
+(load-file "finite_field.egi")
+(load-file "polynomial_ring.egi")
+
+;construction of cubic ext
+(define $f (+ (** x 3) x 1))
+
+;define operations
+
+;generate subgroup of multiplicative group
+(define $generate (lambda [$a]
+	(match (map 1#(snd (p.P./ (** a %1) f x)) (take 124 nats))
+	       (list math-expr)
+	       	     {[<join $m <cons ,1 _>> (cons 1 m)]})))
+(generate x)
+
+;computaion of order
+
+;action of Frobenius
+(define $Frob (lambda [$a] (snd (p.P./ (** a p) f x))))
+(define $Frob-id (lambda [$a] (f.p.- (Frob a) a)))
+(define $Frob2-id (lambda [$a] (f.p.- (Frob (Frob a)) a)))
+(define $Frob3-id (lambda [$a] (f.p.- (Frob (Frob (Frob a))) a)))
+(map Frob-id (generate x))
+(map Frob2-id (generate x))
+(map Frob3-id (generate x))

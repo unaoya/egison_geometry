@@ -1,0 +1,39 @@
+(load-file "finite_field.egi")
+(load-file "polynomial_ring.egi")
+
+;construction of quartic extension
+(define $f (+ (** x 4) x 4))
+
+;define operations
+
+;generate subgroup of multiplicative group
+(define $generate (lambda [$a]
+	(match (map 1#(snd (p.P./ (** a %1) f x)) (take 624 nats))
+	       (list math-expr)
+	       	     {[<join $m <cons ,1 _>> (cons 1 m)]})))
+(generate x)
+
+;computaion of order
+
+;action of Frobenius
+(define $Frob (lambda [$a] (snd (p.P./ (** a p) f x))))
+(define $Frob-id (lambda [$a] (f.p.- (Frob a) a)))
+(define $Frob2-id (lambda [$a] (f.p.- (Frob (Frob a)) a)))
+(define $Frob3-id (lambda [$a] (f.p.- (Frob (Frob (Frob a))) a)))
+(define $Frob4-id (lambda [$a] (f.p.- (Frob (Frob (Frob (Frob a)))) a)))
+(map Frob-id (generate x))
+(map Frob2-id (generate x))
+(map Frob3-id (generate x))
+(map Frob4-id (generate x))
+
+;(define $multx2 (lambda [$y] (snd (p.P./ (f.p.* x y) h x))))
+;(car (recf multx2 {1} 624))
+;(map 1#(snd (p.P./ (** x %1) g x)) (take 625 nats))
+
+;(define $addf (lambda [$f $xs] (cons (f (car xs)) xs)))
+;(define $add1 (lambda [$x] (+ x 1)))
+;(define $recf (lambda [$f $xs $n] (match n integer {[,0 xs] [_ (recf f (cons (f (car xs)) xs) (- n 1))]})))
+;(define $multx (lambda [$y] (snd (p.P./ (f.p.* x y) g x))))
+;(car (recf multx {1} 124))
+;(map 1#(snd (p.P./ (** x %1) g x)) (take 125 nats))
+

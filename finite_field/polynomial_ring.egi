@@ -1,0 +1,41 @@
+(load-file "finite_field.egi")
+
+;definition of the ring F_p[x]
+(define $coef-mod-p
+  (lambda [$f $x]
+    (foldr 2#(+ (* x %2) %1) 0 (map mod-p (coefficients f x)))))
+(define $f.p.b.+
+  (lambda [%a %b] (coef-mod-p (+ a b) x)))
+(define $f.p.+
+  (cambda $xs (foldl f.p.b.+ (car xs) (cdr xs))))
+(define $f.p.b.-
+  (lambda [%a %b] (coef-mod-p (- a b) x)))
+(define $f.p.-
+  (cambda $xs (foldl f.p.b.- (car xs) (cdr xs))))
+(define $f.p.b.*
+  (lambda [%a %b] (coef-mod-p (* a b) x)))
+(define $f.p.*
+  (cambda $xs (foldl f.p.b.* (car xs) (cdr xs))))
+(define $f.p.inv
+  (lambda [%x]
+    (car (filter (lambda [$a] (eq? (p.* a x) 1)) (take p nats)))))
+
+(define $p.L./
+  (lambda [$xs $ys]
+    (if (lt? (length xs) (length ys))
+      [{} xs]
+      (match [ys xs] [(list math-expr) (list math-expr)]
+        {
+         [[<cons $y $yrs> <cons $x $xrs>]
+          (let {[[$zs $rs] (p.L./ {@(map2 p.- (take (length yrs) xrs) (map (p.* $ (p./ x y)) yrs))
+                                   @(drop (length yrs) xrs)} ys)]}
+            [{(p./ x y) @zs} rs])]
+         }))))
+
+(define $p.P./
+  (lambda [$fx $gx $x]
+    (let* {[$as (reverse (coefficients fx x))]
+           [$bs (reverse (coefficients gx x))]
+           [[$zs $rs] (p.L./ as bs)]}
+      [(sum (map2 2#(f.p.* %1 (**' x %2)) (reverse zs) nats0))
+       (sum (map2 2#(f.p.* %1 (**' x %2)) (reverse rs) nats0))])))

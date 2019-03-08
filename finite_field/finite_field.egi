@@ -1,0 +1,25 @@
+(define $p 5)
+(define $mod-p
+  (lambda [$x] (modulo x p)))
+
+;definition of the field F_p
+(define $p.b.+
+  (lambda [%x %y] (modulo (+ x y) p)))
+(define $p.+
+  (cambda $xs (foldl p.b.+ (car xs) (cdr xs))))
+(define $p.b.-
+  (lambda [%x %y] (modulo (- x y) p)))
+(define $p.-
+  (cambda $xs (foldl p.b.- (car xs) (cdr xs))))
+(define $p.b.*
+  (lambda [%x %y] (modulo (* x y) p)))
+(define $p.*
+  (cambda $xs (foldl p.b.* (car xs) (cdr xs))))
+(define $p.inv
+  (lambda [%x]
+    (car (filter (lambda [$a] (eq? (p.* a x) 1)) (take p nats)))))
+(define $p.b./
+  (lambda [%x %y] (p.* x (p.inv y))))
+(define $p./
+  (cambda $xs (foldl p.b./ (car xs) (cdr xs))))
+
