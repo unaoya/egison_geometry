@@ -5,12 +5,20 @@
 (define $f (+ (** x 2) 2))
 
 ;define operations
+(define $q.*
+  (lambda [$a $b] (snd (p.P./ (f.p.* a b) f x))))
+
+;(define $n 100)
+(define $generate (lambda [$x]
+                    (match
+                      (scanl (lambda [$r $n] (q.* r n)) x (repeat1 x)) (list integer)
+                      {[<join $m <cons ,1 _>> (cons 1 m)]})))
 
 ;generate subgroup of multiplicative group
-(define $generate (lambda [$a]
-	(match (map 1#(snd (p.P./ (** a %1) f x)) (take 24 nats))
-	       (list math-expr)
-	       	     {[<join $m <cons ,1 _>> (cons 1 m)]})))
+;(define $generate (lambda [$a]
+;	(match (map 1#(snd (p.P./ (** a %1) f x)) (take 24 nats))
+;	       (list math-expr)
+;	       	     {[<join $m <cons ,1 _>> (cons 1 m)]})))
 (generate x)
 (generate (f.p.+ x 1))
 

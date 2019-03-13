@@ -7,10 +7,11 @@
 ;define operations
 
 ;generate subgroup of multiplicative group
-(define $generate (lambda [$a]
-	(match (map 1#(snd (p.P./ (** a %1) f x)) (take 124 nats))
-	       (list math-expr)
-	       	     {[<join $m <cons ,1 _>> (cons 1 m)]})))
+(define $generate (lambda [$x]
+                    (match
+                      (scanl (lambda [$r $n] (q.* r n)) x (repeat1 x)) (list integer)
+                      {[<join $m <cons ,1 _>> (cons 1 m)]})))
+
 (generate x)
 
 ;computaion of order

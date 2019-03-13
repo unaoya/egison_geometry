@@ -1,0 +1,7 @@
+(load-file "./finite_field.egi")
+
+(define $x 2)
+(match
+  (scanl (lambda [$r $n] (p.* r n)) x (take 5 (repeat1 x)))
+  (list integer)
+  {[<join $m <cons ,1 _>> (cons 1 m)]})
